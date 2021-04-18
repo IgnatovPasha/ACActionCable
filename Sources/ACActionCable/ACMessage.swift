@@ -57,14 +57,14 @@ public enum ACMessageType: String, Decodable {
 
 public enum ACMessageBody: Decodable {
     case ping(Int)
-    case object(ACMessageBodyObject)
+    case custom(ACMessageBodyObject)
     
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if let value = try? container.decode(Int.self) {
             self = .ping(value)
         } else if let value = try? container.decode(ACMessageBodyObject.self) {
-            self = .object(value)
+            self = .custom(value)
         } else {
             throw DecodingError.typeMismatch(ACMessageBody.self, DecodingError.Context(codingPath: container.codingPath, debugDescription: "Unable to parse message body"))
         }
