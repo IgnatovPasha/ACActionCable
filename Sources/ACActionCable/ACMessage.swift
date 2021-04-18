@@ -57,14 +57,14 @@ public enum ACMessageType: String, Decodable {
 
 public enum ACMessageBody: Decodable {
     case ping(Int)
-    case dictionary(ACMessageBodyObject)
+    case object(ACMessageBodyObject)
     
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if let value = try? container.decode(Int.self) {
             self = .ping(value)
         } else if let value = try? container.decode(ACMessageBodyObject.self) {
-            self = .dictionary(value)
+            self = .object(value)
         } else {
             throw DecodingError.typeMismatch(ACMessageBody.self, DecodingError.Context(codingPath: container.codingPath, debugDescription: "Unable to parse message body"))
         }
@@ -99,6 +99,11 @@ public struct ACMessageBodyObject: Decodable {
 
         decoders[camelCaseTypeName] = { container in
             try container.decode(A.self, forKey: DynamicKey(stringValue: camelCaseTypeName)!)
+        }
+    }
+    public static func register<A: Decodable>(_ type: A.Type, forKey key: String) {
+        decoders[key] = { container in
+            try container.decode(A.self, forKey: DynamicKey(stringValue: key)!)
         }
     }
 }
